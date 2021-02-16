@@ -3,7 +3,7 @@ import { StyleSheet, View, Text } from 'react-native';
 
 const GuessList = (props) => {
   return (
-    <View key={props.guess} style={styles.listItem}>
+    <View style={styles.listItem}>
       <Text style={styles.listText}>Guess #{props.round}: </Text>
       <Text style={styles.listText}>{props.guess}</Text>
     </View>

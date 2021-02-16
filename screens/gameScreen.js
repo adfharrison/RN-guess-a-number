@@ -6,6 +6,7 @@ import {
   Button,
   Alert,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import Colors from '../constants/colors';
 import NumberContainer from '../components/numberContainer';
@@ -74,7 +75,11 @@ const GameScreen = (props) => {
         <ScrollView contentContainerStyle={styles.list}>
           {pastGuesses.map((guess, index) => {
             return (
-              <GuessList guess={guess} round={pastGuesses.length - index} />
+              <GuessList
+                key={guess}
+                guess={guess}
+                round={pastGuesses.length - index}
+              />
             );
           })}
         </ScrollView>
@@ -95,11 +100,11 @@ const styles = StyleSheet.create({
     width: 400,
     maxWidth: '95%',
     justifyContent: 'space-around',
-    marginTop: 20,
+    marginTop: Dimensions.get('window').height > 600 ? 20 : 5,
   },
   listContainer: {
     flex: 1,
-    width: '80%',
+    width: Dimensions.get('window').width > 500 ? '60%' : '80%',
   },
   list: {
     flexGrow: 1,
