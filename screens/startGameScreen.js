@@ -9,6 +9,8 @@ import {
   Keyboard,
   Alert,
   Dimensions,
+  ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import Card from '../components/card';
 import Colors from '../constants/colors';
@@ -21,6 +23,19 @@ const StartGameScreen = (props) => {
   const [enteredValue, setEnteredValue] = useState('');
   const [inputConfirmed, setInputConfirmed] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState('');
+  const [buttonWidth, setButtonWidth] = useState(
+    Dimensions.get('window').width / 4
+  );
+
+  useEffect(() => {
+    const updateLayout = () => {
+      setButtonWidth(Dimensions.get('window').width / 4);
+    };
+    Dimensions.addEventListener('change', updateLayout);
+    return () => {
+      Dimensions.removeEventListener('change', updateLayout);
+    };
+  });
 
   const numberInputHandler = (inputText) => {
     setEnteredValue(inputText.replace(/[^0-9]/g, ''));
@@ -65,48 +80,54 @@ const StartGameScreen = (props) => {
     );
   }
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-      }}
-    >
-      <View style={styles.screen}>
-        <View style={styles.titleContainer}>
-          <Text style={Fonts.title}>Start a New Game!</Text>
-        </View>
+    <ScrollView>
+      <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={30}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+          }}
+        >
+          <View style={styles.screen}>
+            <View style={styles.titleContainer}>
+              <Text style={Fonts.title}>Start a New Game!</Text>
+            </View>
 
-        <Card style={styles.inputContainer}>
-          <Text style={Fonts.body}>Select a number</Text>
-          <Input
-            blurOnSubmit
-            autoCapitalize='none'
-            autoCorrect={false}
-            keyboardType={'number-pad'}
-            maxLength={2}
-            onChangeText={numberInputHandler}
-            value={enteredValue}
-            style={styles.input}
-          />
-          <View style={styles.buttonContainer}>
-            <View style={styles.button}>
-              <Button
-                title='Reset'
-                onPress={resetInputHandler}
-                color={Colors.secondary}
+            <Card style={styles.inputContainer}>
+              <Text style={Fonts.body}>Select a number</Text>
+              <Input
+                blurOnSubmit
+                autoCapitalize='none'
+                autoCorrect={false}
+                keyboardType={'number-pad'}
+                maxLength={2}
+                onChangeText={numberInputHandler}
+                value={enteredValue}
+                style={styles.input}
               />
-            </View>
-            <View style={styles.button}>
-              <Button
-                title='Confirm'
-                onPress={confirmInputhandler}
-                color={Colors.primary}
-              />
-            </View>
+              <View style={styles.buttonContainer}>
+                <View style={styles.button}>
+                  <Button
+                    title='Reset'
+                    onPress={resetInputHandler}
+                    color={Colors.secondary}
+                    style={{ width: buttonWidth }}
+                  />
+                </View>
+                <View style={styles.button}>
+                  <Button
+                    title='Confirm'
+                    onPress={confirmInputhandler}
+                    color={Colors.primary}
+                    style={{ width: buttonWidth }}
+                  />
+                </View>
+              </View>
+            </Card>
+            {confirmedOutput}
           </View>
-        </Card>
-        {confirmedOutput}
-      </View>
-    </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
 
@@ -137,9 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 10,
   },
-  button: {
-    width: Dimensions.get('window').width / 4,
-  },
+
   summaryContainer: {
     marginTop: 20,
     alignItems: 'center',

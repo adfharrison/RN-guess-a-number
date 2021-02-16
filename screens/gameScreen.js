@@ -23,8 +23,25 @@ const GameScreen = (props) => {
   const [rounds, setRounds] = useState(0);
 
   const [pastGuesses, setPastGuesses] = useState([initialGuess]);
+  const [availableWidth, setAvailableWidth] = useState(
+    Dimensions.get('window').width
+  );
+  const [availableHeight, setAvailableHeight] = useState(
+    Dimensions.get('window').height
+  );
 
   const { userChoice, onGameOver } = props;
+
+  useEffect(() => {
+    const updateLayout = () => {
+      setAvailableWidth(Dimensions.get('window').width);
+      setAvailableHeight(Dimensions.get('window').height);
+    };
+    Dimensions.addEventListener('change', updateLayout);
+    return () => {
+      Dimensions.removeEventListener('change', updateLayout);
+    };
+  });
 
   useEffect(() => {
     if (currentGuess === userChoice) {
@@ -59,36 +76,76 @@ const GameScreen = (props) => {
     setPastGuesses((currPastGuesses) => [nextNumber, ...currPastGuesses]);
     setRounds((curRounds) => curRounds + 1);
   };
-  return (
-    <View style={styles.screen}>
-      <Text style={Fonts.title}>Opponent's guess</Text>
-      <NumberContainer>{currentGuess}</NumberContainer>
-      <Card style={styles.buttonContainer}>
-        <MainButton onPress={nextGuessHandler.bind(this, 'lower')}>
-          <Ionicons name='md-remove' size={24} color='white' />
-        </MainButton>
-        <MainButton onPress={nextGuessHandler.bind(this, 'higher')}>
-          <Ionicons name='md-add' size={24} color='white' />
-        </MainButton>
-      </Card>
-      <View style={styles.listContainer}>
-        <ScrollView contentContainerStyle={styles.list}>
-          {pastGuesses.map((guess, index) => {
-            return (
-              <GuessList
-                key={guess}
-                guess={guess}
-                round={pastGuesses.length - index}
-              />
-            );
-          })}
-        </ScrollView>
+
+  if (availableHeight < 400) {
+    return (
+      <View style={styles.screen}>
+        <Text style={Fonts.title}>Opponent's guess</Text>
+        <View style={styles.control}>
+          <MainButton onPress={nextGuessHandler.bind(this, 'lower')}>
+            <Ionicons name='md-remove' size={24} color='white' />
+          </MainButton>
+          <NumberContainer>{currentGuess}</NumberContainer>
+          {/* <Card style={styles.buttonContainer}> */}
+
+          <MainButton onPress={nextGuessHandler.bind(this, 'higher')}>
+            <Ionicons name='md-add' size={24} color='white' />
+          </MainButton>
+        </View>
+
+        <View style={styles.listContainer}>
+          <ScrollView contentContainerStyle={styles.list}>
+            {pastGuesses.map((guess, index) => {
+              return (
+                <GuessList
+                  key={guess}
+                  guess={guess}
+                  round={pastGuesses.length - index}
+                />
+              );
+            })}
+          </ScrollView>
+        </View>
       </View>
-    </View>
-  );
+    );
+  } else {
+    return (
+      <View style={styles.screen}>
+        <Text style={Fonts.title}>Opponent's guess</Text>
+        <NumberContainer>{currentGuess}</NumberContainer>
+        <Card style={styles.buttonContainer}>
+          <MainButton onPress={nextGuessHandler.bind(this, 'lower')}>
+            <Ionicons name='md-remove' size={24} color='white' />
+          </MainButton>
+          <MainButton onPress={nextGuessHandler.bind(this, 'higher')}>
+            <Ionicons name='md-add' size={24} color='white' />
+          </MainButton>
+        </Card>
+        <View style={styles.listContainer}>
+          <ScrollView contentContainerStyle={styles.list}>
+            {pastGuesses.map((guess, index) => {
+              return (
+                <GuessList
+                  key={guess}
+                  guess={guess}
+                  round={pastGuesses.length - index}
+                />
+              );
+            })}
+          </ScrollView>
+        </View>
+      </View>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
+  control: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '80%',
+  },
   screen: {
     flex: 1,
     padding: 10,
